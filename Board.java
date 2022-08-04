@@ -7,7 +7,7 @@ import javax.swing.*;
 public class Board extends JPanel implements ActionListener, KeyListener {
 
     // controls the delay between each tick in ms
-    private final int DELAY = 25;
+    private final int DELAY = 1;
     // controls the size of the board
     public static final int TILE_SIZE = 50;
     public static final int ROWS = 12;
@@ -16,7 +16,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
     public static final int NUM_COINS = 5;
     // suppress serialization warning
     private static final long serialVersionUID = 490905409104883233L;
-    
+    private ArrayList<Coin> collectedCoins = new ArrayList<>();
     // keep a reference to the timer object that triggers actionPerformed() in
     // case we need access to it in another method
     private Timer timer;
@@ -28,7 +28,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
         // set the game board size
         setPreferredSize(new Dimension(TILE_SIZE * COLUMNS, TILE_SIZE * ROWS));
         // set the game board background color
-        setBackground(new Color(232, 232, 232));
+        setBackground(new Color(132, 132, 132));
 
         // initialize the game state
         player = new Player();
@@ -94,18 +94,23 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 
     private void drawBackground(Graphics g) {
         // draw a checkered background
-        g.setColor(new Color(214, 214, 214));
+        g.setColor(new Color(115, 115, 115));
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLUMNS; col++) {
                 // only color every other tile
                 if ((row + col) % 2 == 1) {
                     // draw a square tile at the current row/column position
-                    g.fillRect(
+                    /*g.fillRect(
                         col * TILE_SIZE, 
                         row * TILE_SIZE, 
                         TILE_SIZE, 
-                        TILE_SIZE
-                    );
+                        TILE_SIZE*/
+                    g.fill3DRect(col * TILE_SIZE, 
+                    row * TILE_SIZE, 
+                    TILE_SIZE, 
+                    TILE_SIZE,
+                    true);
+                    
                 }
             }    
         }
@@ -158,19 +163,29 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 
         return coinList;
     }
-
+    private void generateCoin(){
+        Random rand = new Random();
+        int coinX = rand.nextInt(COLUMNS);
+        int coinY = rand.nextInt(ROWS);
+        coins.add(new Coin(coinX, coinY));
+    }
     private void collectCoins() {
         // allow player to pickup coins
-        ArrayList<Coin> collectedCoins = new ArrayList<>();
+        boolean is_true = false;
         for (Coin coin : coins) {
             // if the player is on the same tile as a coin, collect it
             if (player.getPos().equals(coin.getPos())) {
                 // give the player some points for picking this up
                 player.addScore(100);
                 collectedCoins.add(coin);
+                is_true=true;
+
             }
         }
         // remove collected coins from the board
+        if(is_true){
+            generateCoin();
+        }
         coins.removeAll(collectedCoins);
     }
 
