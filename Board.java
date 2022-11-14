@@ -7,11 +7,12 @@ import javax.swing.*;
 public class Board extends JPanel implements ActionListener, KeyListener {
 
     // controls the delay between each tick in ms
-    private final int DELAY = 1;
+    private final int DELAY = 250;
+    public static String message ;
     // controls the size of the board
     public static final int TILE_SIZE = 50;
-    public static final int ROWS = 12;
-    public static final int COLUMNS = 18;
+    public static final int ROWS = 20;
+    public static final int COLUMNS = 20;
     // controls how many coins appear on the board
     public static final int NUM_COINS = 5;
     // suppress serialization warning
@@ -33,12 +34,16 @@ public class Board extends JPanel implements ActionListener, KeyListener {
         // initialize the game state
         player = new Player();
         coins = populateCoins();
+        message ="";
 
         // this timer will call the actionPerformed() method every DELAY ms
         timer = new Timer(DELAY, this);
         timer.start();
     }
-
+    public String getMessage(){
+        return message;
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         // this method is called by the timer every DELAY ms.
@@ -46,6 +51,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
         // before the graphics are redrawn.
 
         // prevent the player from disappearing off the board
+        player.moveforward();
         player.tick();
 
         // give the player points for collecting coins
@@ -65,6 +71,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
         // react to imageUpdate() events triggered by g.drawImage()
 
         // draw our graphics.
+        gameover(g);
         drawBackground(g);
         drawScore(g);
         for (Coin coin : coins) {
@@ -131,14 +138,14 @@ public class Board extends JPanel implements ActionListener, KeyListener {
             RenderingHints.KEY_FRACTIONALMETRICS,
             RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         // set the text color and font
-        g2d.setColor(new Color(30, 201, 139));
+        g2d.setColor(new Color(30, 201,139));
         g2d.setFont(new Font("Lato", Font.BOLD, 25));
         // draw the score in the bottom center of the screen
         // https://stackoverflow.com/a/27740330/4655368
         FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
         // the text will be contained within this rectangle.
-        // here I've sized it to be the entire bottom row of board tiles
-        Rectangle rect = new Rectangle(0, TILE_SIZE * (ROWS - 1), TILE_SIZE * COLUMNS, TILE_SIZE);
+        // here I've sized it to be the entire bottom row of board tiles 0, TILE_SIZE * (ROWS - 1), TILE_SIZE * COLUMNS, TILE_SIZE
+        Rectangle rect = new Rectangle(0,TILE_SIZE * (ROWS - 1), TILE_SIZE * COLUMNS, TILE_SIZE);
         // determine the x coordinate for the text
         int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
         // determine the y coordinate for the text
@@ -179,6 +186,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
                 player.addScore(100);
                 collectedCoins.add(coin);
                 is_true=true;
+                Player.larger();
 
             }
         }
@@ -187,6 +195,31 @@ public class Board extends JPanel implements ActionListener, KeyListener {
             generateCoin();
         }
         coins.removeAll(collectedCoins);
+    }
+
+    public static void gameover(Graphics g) {
+        String text = message;
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(
+            RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setRenderingHint(
+            RenderingHints.KEY_RENDERING,
+            RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(
+            RenderingHints.KEY_FRACTIONALMETRICS,
+            RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        // set the text color and font
+        g2d.setColor(new Color(255, 0, 0));
+        g2d.setFont(new Font("Lato", Font.BOLD, 100));
+        FontMetrics metrics = g2d.getFontMetrics(g2d.getFont());
+        Rectangle rect = new Rectangle(0, TILE_SIZE * (ROWS/2), TILE_SIZE * COLUMNS, TILE_SIZE);
+        int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
+        int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
+        g2d.drawString(text, x, y);
+    }
+    public static void setMessage(String m) {
+        message = m;
     }
 
 }

@@ -15,21 +15,22 @@ public class Player {
     private Point pos;
     // keep track of the player's score
     private int score;
-
+    private char direction;
     public Player() {
         // load the assets
         loadImage();
-
+        
         // initialize the state
         pos = new Point(0, 0);
         score = 0;
+        direction = 'E';
     }
 
     private void loadImage() {
         try {
             // you can use just the filename if the image file is in your
             // project folder, otherwise you need to provide the file path.
-            image = ImageIO.read(new File("images/player.png"));
+            image = ImageIO.read(new File("images/player2.jpg"));
         } catch (IOException exc) {
             System.out.println("Error opening image file: " + exc.getMessage());
         }
@@ -57,15 +58,19 @@ public class Player {
         // one whole tile for this input
         if (key == KeyEvent.VK_UP) {
             pos.translate(0, -1);
+            direction = 'N';
         }
         if (key == KeyEvent.VK_RIGHT) {
             pos.translate(1, 0);
+            direction = 'E';
         }
         if (key == KeyEvent.VK_DOWN) {
             pos.translate(0, 1);
+            direction = 'S';
         }
         if (key == KeyEvent.VK_LEFT) {
             pos.translate(-1, 0);
+            direction = 'W';
         }
     }
 
@@ -76,14 +81,19 @@ public class Player {
         // prevent the player from moving off the edge of the board sideways
         if (pos.x < 0) {
             pos.x = 0;
+            Board.setMessage("Game Over");
+
         } else if (pos.x >= Board.COLUMNS) {
             pos.x = Board.COLUMNS - 1;
+            Board.setMessage("Game Over");
         }
         // prevent the player from moving off the edge of the board vertically
         if (pos.y < 0) {
             pos.y = 0;
+            Board.setMessage("Game Over");
         } else if (pos.y >= Board.ROWS) {
             pos.y = Board.ROWS - 1;
+            Board.setMessage("Game Over");
         }
     }
 
@@ -97,6 +107,21 @@ public class Player {
 
     public Point getPos() {
         return pos;
+    }
+
+    public void moveforward() {
+        if(direction == 'E'){
+            pos.translate(1, 0);
+        }else if(direction == 'W'){
+            pos.translate(-1, 0);
+        }else if (direction == 'N'){
+            pos.translate(0, -1);
+        }else{
+            pos.translate(0, 1);
+        }
+    }
+
+    public static void larger() {
     }
 
 }
